@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -56,7 +55,7 @@ func main() {
 		ctx.JSON(http.StatusOK, gin.H{
 			"msg": "注册成功！",
 		})
-		log.Panicln(name, telephone, password)
+		//log.Panicln(name, telephone, password)
 
 	})
 
@@ -94,7 +93,7 @@ func InitDB() *gorm.DB {
 			charset,
 		)
 	*/
-	dsn := "root:root@tcp(localhost:3306)/gin_vue?charset=utf8&parseTime=True&loc=local"
+	dsn := "root:root@tcp(localhost:3306)/gin_vue?charset=utf8&parseTime=True"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("Failed to connect databases, err:" + err.Error())
