@@ -1,19 +1,25 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"log"
 	"math/rand"
 	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
+
+type User struct {
+	Name      string
+	Telephone string
+	Password  string
+	ID        int
+}
 
 func main() {
 	db := InitDB()
-	defer db.close()
+	defer db.Clauses()
 	r := gin.Default()
 	r.POST("/api/auth/register", func(ctx *gin.Context) {
 		// 获取参数
@@ -71,22 +77,25 @@ func RandomString(n int) string {
 
 // InitDB 数据库连接
 func InitDB() *gorm.DB {
-	driverName := "mysql"
-	host := "localhost"
-	port := "3306"
-	username := "root"
-	password := "root"
-	database := "gin_vue"
-	charset := "utf8"
-	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true",
-		username,
-		password,
-		host,
-		port,
-		database,
-		charset,
-	)
-	db, err := gorm.Open(driverName, args)
+	/*
+		driverName := "mysql"
+		host := "localhost"
+		port := "3306"
+		username := "root"
+		password := "root"
+		database := "gin_vue"
+		charset := "utf8"
+		args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true",
+			username,
+			password,
+			host,
+			port,
+			database,
+			charset,
+		)
+	*/
+	dsn := "root:root@tcp(localhost:3306)/gin_vue?charset=utf8&parseTime=True&loc=local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("Failed to connect databases, err:" + err.Error())
 	}
