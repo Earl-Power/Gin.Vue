@@ -7,8 +7,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 )
+
+// isTelephoneExist 手机号查询验证
+func isTelephoneExist(db *gorm.DB, telephone string) bool {
+	var user models.User
+	db.Where("telephone=?", telephone).First(&user)
+	if user.ID != 0 {
+		return true
+	}
+	return false
+}
 
 // Register 用户注册逻辑
 func Register(ctx *gin.Context) {
@@ -87,17 +98,18 @@ func Login(ctx *gin.Context) {
 		return
 	}
 	// 返回token
-	token := "01"
+	token, err := common.ReleaseToken(user)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "系统异常"})
+		log.Printf("token generate error: %v", err)
+		return
+	}
 	// 返回结果
 	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"Token": token}, "msg": "登录成功"})
 }
 
-// isTelephoneExist
-func isTelephoneExist(db *gorm.DB, telephone string) bool {
-	var user models.User
-	db.Where("telephone=?", telephone).First(&user)
-	if user.ID != 0 {
-		return true
-	}
-	return false
+// Info 用户信息获取（登录后）
+func Info(ctx *gin.Context) {
+	user, _ := ctx.Get("user")
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": user}})
 }
