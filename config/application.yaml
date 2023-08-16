@@ -1,0 +1,11 @@
+server:
+# Mode: release==0 debug==1
+  Mode: 11
+  port: 8080
+datasource:
+  driverType: mysql
+  host: 127.0.0.1
+  database: gin_vue
+  username: earl
+  password: earl
+  charset: utf8
