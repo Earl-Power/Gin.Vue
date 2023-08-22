@@ -11,5 +11,6 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/auth/login", controllers.Login)
 	// 通过中间件授权保护用户信息
 	r.GET("/api/auth/info", middleware.AuthMiddleware(), controllers.Info)
+	r.POST("/api/auth/update", middleware.AuthMiddleware(), controllers.Update)
 	return r
 }

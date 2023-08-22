@@ -16,7 +16,17 @@ import (
 // isTelephoneExist 手机号查询验证
 func isTelephoneExist(db *gorm.DB, telephone string) bool {
 	var user models.User
-	db.Where("telephone=?", telephone).First(&user)
+	db.Where("telephone = ?", telephone).First(&user)
+	if user.ID != 0 {
+		return true
+	}
+	return false
+}
+
+// isNameExist 用户名查询验证
+func isNameExist(db *gorm.DB, name string) bool {
+	var user models.User
+	db.Where("name = ?", name).First(&user)
 	if user.ID != 0 {
 		return true
 	}
@@ -70,6 +80,34 @@ func Register(ctx *gin.Context) {
 	//ctx.JSON(http.StatusOK, gin.H{"code": 200, "msg": "注册成功！"})
 	responses.Success(ctx, nil, "注册成功！")
 	// log.Panicln(name, telephone, password)
+}
+
+// Delete 删除用户
+func Delete() {
+
+}
+
+// Update 更新用户
+func Update(ctx *gin.Context) {
+	DB := common.GetDb()
+	var _ models.User
+	name := ctx.PostForm("name")
+	telephone := ctx.PostForm("telephone")
+	password := ctx.PostForm("password")
+
+	// 判断用户名是否存在
+	if isNameExist(DB, name) {
+		responses.Response(ctx, http.StatusUnprocessableEntity, 200, nil, "该用户名已经被占用！")
+		//ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 200, "msg": "该用户名已经被占用！"})
+	}
+	// 判断手机号是否存在
+	if isTelephoneExist(DB, telephone) {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 200, "msg": "该手机号码已经被占用！"})
+		return
+	}
+	if len(password) > 6 {
+		responses.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能小于6位！")
+	}
 }
 
 // Login 用户登录逻辑
